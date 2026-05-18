@@ -1,53 +1,41 @@
-// src/store/authStore.ts
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { User } from '@/types/auth';
 
-interface AuthState {
-  user: any | null;
+interface AuthStore {
+  user: User | null;
   token: string | null;
-  loading: boolean;
-  error: string | null;
-  setUser: (user: any) => void;
-  setToken: (token: string | null) => void;
+  isLoading: boolean;
+  setUser: (user: User) => void;
+  setToken: (token: string) => void;
   setLoading: (loading: boolean) => void;
-  setError: (error: string | null) => void;
   logout: () => void;
   isAuthenticated: () => boolean;
 }
 
-const useAuthStore = create<AuthState>((set, get) => ({
-  user: null,
-  // Safely check localStorage on client side
-  token: typeof window !== 'undefined' ? localStorage.getItem('access_token') : null,
-  loading: false,
-  error: null,
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      token: null,
+      isLoading: false,
 
-  setUser: (user) => set({ user }),
-  
-  setToken: (token) => {
-    if (typeof window !== 'undefined') {
-      if (token) {
+      setUser: (user: User): void => { set({ user }); },
+
+      setToken: (token: string): void => {
         localStorage.setItem('access_token', token);
-      } else {
+        set({ token });
+      },
+
+      setLoading: (isLoading: boolean): void => {set({ isLoading }); },
+
+      logout: (): void => {
         localStorage.removeItem('access_token');
-      }
-    }
-    set({ token });
-  },
+        set({ user: null, token: null });
+      },
 
-  setLoading: (loading) => set({ loading }),
-  
-  setError: (error) => set({ error }),
-
-  logout: () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('access_token');
-    }
-    set({ user: null, token: null });
-  },
-
-  isAuthenticated: () => {
-    return !!get().token;
-  },
-}));
-
-export default useAuthStore;
+      isAuthenticated: (): boolean => !!get().token,
+    }),
+    { name: 'lifekart-auth' }
+  )
+);

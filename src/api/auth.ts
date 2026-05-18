@@ -1,32 +1,19 @@
-// src/api/auth.ts
-import api from '../utils/api';
+import apiClient from './client';
+import { AuthResponse, LoginRequest, SignupRequest, User } from '@/types/auth';
 
-// SIGNUP - Create new account
-export const signup = async (userData: any) => {
-  try {
-    const response = await api.post('/auth/signup', userData);
-    return response.data;
-  } catch (error: any) {
-    throw error.response?.data || error.message;
-  }
-};
+export const authAPI = {
+  login: async (data: LoginRequest): Promise<AuthResponse> => {
+    const res = await apiClient.post<AuthResponse>('/auth/login', data);
+    return res.data;
+  },
 
-// LOGIN - Get JWT token
-export const login = async (credentials: any) => {
-  try {
-    const response = await api.post('/auth/login', credentials);
-    return response.data;
-  } catch (error: any) {
-    throw error.response?.data || error.message;
-  }
-};
+  signup: async (data: SignupRequest): Promise<AuthResponse> => {
+    const res = await apiClient.post<AuthResponse>('/auth/signup', data);
+    return res.data;
+  },
 
-// GET CURRENT USER - Fetch logged-in user info
-export const getCurrentUser = async () => {
-  try {
-    const response = await api.get('/auth/me');
-    return response.data;
-  } catch (error: any) {
-    throw error.response?.data || error.message;
-  }
+  getMe: async (): Promise<User> => {
+    const res = await apiClient.get<User>('/auth/me');
+    return res.data;
+  },
 };

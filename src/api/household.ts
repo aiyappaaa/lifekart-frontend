@@ -1,32 +1,34 @@
-// src/api/household.ts
-import api from '../utils/api';
+import apiClient from './client';
+import {
+  Household,
+  CreateHouseholdRequest,
+  Member,
+  CreateMemberRequest,
+} from '@/types/household';
 
-// CREATE HOUSEHOLD - Save address and family info
-export const createHousehold = async (householdData: any) => {
-  try {
-    const response = await api.post('/household', householdData);
-    return response.data;
-  } catch (error: any) {
-    throw error.response?.data || error.message;
-  }
-};
+export const householdAPI = {
+  create: async (data: CreateHouseholdRequest): Promise<Household> => {
+    const res = await apiClient.post<Household>('/household', data);
+    return res.data;
+  },
 
-// GET HOUSEHOLD - Fetch user's household info
-export const getHousehold = async (householdId: string) => {
-  try {
-    const response = await api.get(`/household/${householdId}`);
-    return response.data;
-  } catch (error: any) {
-    throw error.response?.data || error.message;
-  }
-};
+  get: async (id: string): Promise<Household> => {
+    const res = await apiClient.get<Household>(`/household/${id}`);
+    return res.data;
+  },
 
-// UPDATE HOUSEHOLD - Update household details
-export const updateHousehold = async (householdId: string, householdData: any) => {
-  try {
-    const response = await api.put(`/household/${householdId}`, householdData);
-    return response.data;
-  } catch (error: any) {
-    throw error.response?.data || error.message;
-  }
+  update: async (id: string, data: Partial<CreateHouseholdRequest>): Promise<Household> => {
+    const res = await apiClient.put<Household>(`/household/${id}`, data);
+    return res.data;
+  },
+
+  addMember: async (householdId: string, data: CreateMemberRequest): Promise<Member> => {
+    const res = await apiClient.post<Member>(`/household/${householdId}/members`, data);
+    return res.data;
+  },
+
+  getMembers: async (householdId: string): Promise<Member[]> => {
+    const res = await apiClient.get<Member[]>(`/household/${householdId}/members`);
+    return res.data;
+  },
 };
