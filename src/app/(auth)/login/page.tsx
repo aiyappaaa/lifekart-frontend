@@ -308,10 +308,10 @@ export default function LoginPage(): React.ReactElement {
           font-size: 13px; color: #94a3b8;
           animation: fadeUp 0.7s ease 0.55s both;
         }
-        .lk-footer a { color: #8b5cf6; font-weight: 500; text-decoration: none; }
+        .lk-footer a { color: #140733; font-weight: 500; text-decoration: none; }
         .lk-footer a:hover { color: #6d28d9; }
 
-        /* Trust bar */
+        /* Trust bar */ 
         .lk-trust {
           display: flex; align-items: center; justify-content: center; gap: 6px;
           margin-top: 20px; padding-top: 20px;

@@ -27,7 +27,7 @@ export const useAuthStore = create<AuthStore>()(
         set({ token });
       },
 
-      setLoading: (isLoading: boolean): void => {set({ isLoading }); },
+      setLoading: (isLoading: boolean): void => {set({ isLoading });  },
 
       logout: (): void => {
         localStorage.removeItem('access_token');
