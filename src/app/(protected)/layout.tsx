@@ -1,29 +1,24 @@
-// src/app/(protected)/layout.tsx
-'use client';
+import type { Metadata } from 'next';
+import { QueryProvider } from '@/components/providers/QueryProvider';
+import './globals.css';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
+export const metadata: Metadata = {
+  title: 'LifeKart OS | Lifetime Commerce',
+  description: 'The operating system for lifetime human consumption and wholesale pricing.',
+};
 
-export default function ProtectedLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
-}): React.ReactElement {
-  const router = useRouter();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated());
-
-  useEffect(() => {
-    // If the token is missing, redirect them to the login screen immediately
-    if (!isAuthenticated) {
-      router.replace('/login');
-    }
-  }, [isAuthenticated, router]);
-
-  // Accessibility friendly loading announcement for screen readers
-  if (!isAuthenticated) {
-    return <div aria-live="polite">Redirecting...</div>;
-  }
-
-  return <>{children}</>;
+}) {
+  return (
+    <html lang="en">
+      <body className="bg-background text-white antialiased selection:bg-white/20">
+        <QueryProvider>
+          {children}
+        </QueryProvider>
+      </body>
+    </html>
+  );
 }

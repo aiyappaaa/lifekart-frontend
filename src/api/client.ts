@@ -1,43 +1,34 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios from 'axios';
+import { useAuthStore } from '@/store/authStore';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
-
-export const apiClient = axios.create({
-  baseURL: BASE_URL,
-  headers: { 'Content-Type': 'application/json' },
-  timeout: 30000,
+// 1. Remove the "export" keyword from this initialization
+const apiClient = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1',
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Attach JWT token to every request
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('access_token');
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
-    return config;
+apiClient.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+});
 
-// Handle errors globally
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError<{ detail: string }>) => {
-    const status = error.response?.status;
-    const detail = error.response?.data?.detail || 'Something went wrong';
-
-    // If the backend says the token is invalid/expired, boot them to login
-    if (status === 401) {
+  (error) => {
+    if (error.response?.status === 401) {
+      useAuthStore.getState().logout();
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('access_token');
         window.location.href = '/login';
       }
     }
-
-    return Promise.reject({ detail, status });
+    return Promise.reject(error);
   }
 );
 
+// 2. Add the default export at the bottom so subscriptions.ts can read it
 export default apiClient;
